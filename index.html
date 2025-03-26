@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmConnect - Grow & Buy Organic</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f7f4;
+            scroll-behavior: smooth;
+        }
+        .hero-pattern {
+            background-color: #4a8259;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .farm-plot-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+        .produce-card:hover {
+            transform: scale(1.03);
+            transition: all 0.3s ease;
+        }
+        .testimonial-slider {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            border-radius: 50%;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .farm-stat-card {
+            transition: all 0.3s ease;
+        }
+        .farm-stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loadingSpinner">
+        <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+    </div>
+
+    <!-- Modals -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Login to FarmConnect</h3>
+                <button class="text-gray-500 hover:text-gray-700 close-modal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <input type="email" id="loginEmail" placeholder="Email Address" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <div class="mb-6">
+                <input type="password" id="loginPassword" placeholder="Password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <button id="loginSubmit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">Login</button>
+            <div class="mt-4 text-center">
+                <p>Don't have an account? <a href="#" id="showRegister" class="text-green-600 hover:text-green-700">Register</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Create an Account</h3>
+                <button class="text-gray-500 hover:text-gray-700 close-modal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <input type="text" id="registerName" placeholder="Full Name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <div class="mb-4">
+                <input type="email" id="registerEmail" placeholder="Email Address" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <div class="mb-4">
+                <input type="password" id="registerPassword" placeholder="Password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <div class="mb-6">
+                <input type="tel" id="registerPhone" placeholder="Phone Number" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <div class="mb-6">
+                <label class="flex items-center">
+                    <input type="checkbox" class="mr-2 h-5 w-5 text-green-600" id="termsCheckbox">
+                    <span class="text-sm text-gray-600">I agree to the <a href="#" class="text-green-600 hover:underline">Terms & Conditions</a></span>
+                </label>
+            </div>
+            <button id="registerSubmit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">Register</button>
+            <div class="mt-4 text-center">
+                <p>Already have an account? <a href="#" id="showLogin" class="text-green-600 hover:text-green-700">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationPanel" class="hidden fixed right-5 top-20 w-80 bg-white rounded-lg shadow-xl z-50">
+        <div class="p-4 border-b">
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold">Notifications</h3>
+                <button id="closeNotifications" class="text-gray-500 hover:text-gray-700">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        </div>
+        <div class="max-h-96 overflow-y-auto">
+            <div class="p-4 border-b hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="bg-green-100 p-2 rounded-full mr-3">
+                        <i class="bi bi-bell text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium">Your tomatoes are ready to harvest!</p>
+                        <p class="text-sm text-gray-500">2 hours ago</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-b hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="bg-blue-100 p-2 rounded-full mr-3">
+                        <i class="bi bi-droplet text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium">Irrigation completed for your plot</p>
+                        <p class="text-sm text-gray-500">Yesterday</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-b hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="bg-yellow-100 p-2 rounded-full mr-3">
+                        <i class="bi bi-sun text-yellow-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium">New seasonal crops available!</p>
+                        <p class="text-sm text-gray-500">3 days ago</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-2 text-center">
+            <a href="#" class="text-green-600 text-sm hover:underline">View all notifications</a>
+        </div>
+    </div>
+      
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-green-600">FarmConnect</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#home" class="text-gray-600 hover:text-green-600">Home</a>
+                    <a href="#farmplots" class="text-gray-600 hover:text-green-600">Farm Plots</a>
+                    <a href="#shop" class="text-gray-600 hover:text-green-600">Shop</a>
+                    <a href="#dashboard" class="text-gray-600 hover:text-green-600">Dashboard</a>
+                    <a href="#community" class="text-gray-600 hover:text-green-600">Community</a>
+                    <div class="relative">
+                        <button id="notificationBtn" class="text-gray-600 hover:text-green-600 mr-4 relative">
+                            <i class="bi bi-bell text-xl"></i>
+                            <span class="notification-badge bg-red-500 text-white h-5 w-5 flex items-center justify-center text-xs">3</span>
+                        </button>
+                    </div>
+                    <button id="loginBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Login</button>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="notificationBtnMobile" class="text-gray-600 hover:text-green-600 mr-4 relative">
+                        <i class="bi bi-bell text-xl"></i>
+                        <span class="notification-badge bg-red-500 text-white h-5 w-5 flex items-center justify-center text-xs">3</span>
+                    </button>
+                    <button id="mobileMenuBtn" class="text-gray-600">
+                        <i class="bi bi-list text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white">
+            <a href="#home" class="block px-4 py-2 text-gray-600 hover:bg-green-50">Home</a>
+            <a href="#farmplots" class="block px-4 py-2 text-gray-600 hover:bg-green-50">Farm Plots</a>
+            <a href="#shop" class="block px-4 py-2 text-gray-600 hover:bg-green-50">Shop</a>
+            <a href="#dashboard" class="block px-4 py-2 text-gray-600 hover:bg-green-50">Dashboard</a>
+            <a href="#community" class="block px-4 py-2 text-gray-600 hover:bg-green-50">Community</a>
+            <a href="#" id="loginBtnMobile" class="block px-4 py-2 bg-green-600 text-white">Login</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div id="home" class="hero-pattern text-white py-20">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6">Grow Your Own Organic Food</h1>
+                    <p class="text-lg mb-8">Rent a farm plot, grow organic produce, and connect with local farmers. Monitor your crops in real-time and learn sustainable farming techniques.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <button class="bg-white text-green-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition">
+                            Get Started
+                        </button>
+                        <button class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-white hover:text-green-600 transition">
+                            Watch Demo <i class="bi bi-play-circle-fill ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800" alt="Farm" class="rounded-lg shadow-xl">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="farm-stat-card p-6 rounded-lg shadow-md">
+                    <h3 class="text-4xl font-bold text-green-600 mb-2">5000+</h3>
+                    <p class="text-gray-600">Active Farm Plots</p>
+                </div>
+                <div class="farm-stat-card p-6 rounded-lg shadow-md">
+                    <h3 class="text-4xl font-bold text-green-600 mb-2">12000+</h3>
+                    <p class="text-gray-600">Satisfied Customers</p>
+                </div>
+                <div class="farm-stat-card p-6 rounded-lg shadow-md">
+                    <h3 class="text-4xl font-bold text-green-600 mb-2">200+</h3>
+                    <p class="text-gray-600">Partnered Farmers</p>
+                </div>
+                <div class="farm-stat-card p-6 rounded-lg shadow-md">
+                    <h3 class="text-4xl font-bold text-green-600 mb-2">20+</h3>
+                    <p class="text-gray-600">Crop Varieties</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Our Features</h2>
+            <p class="text-gray-600 text-center mb-12 max-w-3xl mx-auto">Experience our comprehensive suite of tools designed to bring you closer to sustainable farming and organic produce.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="feature-card bg-white p-6 rounded-lg shadow-lg hover:shadow-xl">
+                    <i class="bi bi-house-heart text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Farm Plot Rental</h3>
+                    <p class="text-gray-600">Lease your own farm plot and grow organic vegetables with expert guidance. Choose your preferred location and size.</p>
+                    <a href="#farmplots" class="inline-block mt-4 text-green-600 hover:text-green-700">Learn More <i class="bi bi-arrow-right ml-1"></i></a>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-lg shadow-lg hover:shadow-xl">
+                    <i class="bi bi-basket text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Buy Organic Produce</h3>
+                    <p class="text-gray-600">Purchase fresh, pesticide-free organic vegetables directly from farmers. Locally grown and sustainably harvested.</p>
+                    <a href="#shop" class="inline-block mt-4 text-green-600 hover:text-green-700">Shop Now <i class="bi bi-arrow-right ml-1"></i></a>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-lg shadow-lg hover:shadow-xl">
+                    <i class="bi bi-graph-up text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Live Farm Tracking</h3>
+                    <p class="text-gray-600">Monitor your crops with real-time updates, images, and progress tracking. Get insights on soil health and crop conditions.</p>
+                    <a href="#dashboard" class="inline-block mt-4 text-green-600 hover:text-green-700">View Dashboard <i class="bi bi-arrow-right ml-1"></i></a>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                <div class="feature-card bg-white p-6 rounded-lg shadow-lg hover:shadow-xl">
+                    <i class="bi bi-people text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Community & Learning</h3>
+                    <p class="text-gray-600">Join discussions with like-minded individuals, get farming tips, and learn about sustainable agriculture through workshops and guides.</p>
+                    <a href="#community" class="inline-block mt-4 text-green-600 hover:text-green-700">Join Community <i class="bi bi-arrow-right ml-1"></i></a>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-lg shadow-lg hover:shadow-xl">
+                    <i class="bi bi-calendar-check text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Subscription Model</h3>
+                    <p class="text-gray-600">Subscribe to weekly or monthly organic produce boxes tailored to your preferences. Fresh, diverse, and seasonal selections delivered to your door.</p>
+                    <a href="#" class="inline-block mt-4 text-green-600 hover:text-green-700">Subscribe Now <i class="bi bi-arrow-right ml-1"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Farm Plots Section -->
+    <div id="farmplots" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Available Farm Plots</h2>
+            <p class="text-gray-600 text-center mb-12 max-w-3xl mx-auto">Choose your ideal farm plot based on location, size, and features. Each plot comes with tools, irrigation, and expert guidance.</p>
+            
+            <div class="mb-8 flex flex-wrap justify-center gap-4">
+                <button class="px-4 py-2 rounded-full bg-green-600 text-white hover:bg-green-700 transition">All Plots</button>
+                <button class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition">Near Me</button>
+                <button class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition">Urban Plots</button>
+                <button class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition">Rural Plots</button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="farm-plot-card bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1492496913980-501348b61469?w=800" alt="Farm Plot" class="w-full h-56 object-cover">
+                        <div class="absolute top-0 right-0 bg-green-600 text-white px-4 py-2 rounded-bl-lg">Available</div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold">Hillside Plot #14</h3>
+                            <div class="flex items-center">
+                                <i class="bi bi-star-fill text-yellow-500 mr-1"></i>
+                                <span>4.8</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-gray-600 mb-4">
+                            <i class="bi bi-geo-alt mr-1"></i>
+                            <span>Whitefield, Bangalore</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-green-100 text-green-700 text-sm rounded-full">200 sq ft</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">Irrigation</span>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-sm rounded-full">Tools</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <p class="text-2xl font-bold text-green-600">₹1999<span class="text-sm text-gray-500">/month</span></p>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition select-plot-btn">Select Plot</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="farm-plot-card bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=800" alt="Farm Plot" class="w-full h-56 object-cover">
+                        <div class="absolute top-0 right-0 bg-green-600 text-white px-4 py-2 rounded-bl-lg">Available</div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold">Riverside Plot #7</h3>
+                            <div class="flex items-center">
+                                <i class="bi bi-star-fill text-yellow-500 mr-1"></i>
+                                <span>4.6</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-gray-600 mb-4">
+                            <i class="bi bi-geo-alt mr-1"></i>
+                            <span>Sarjapur, Bangalore</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-green-100 text-green-700 text-sm rounded-full">400 sq ft</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">Irrigation</span>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-sm rounded-full">Premium Tools</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <p class="text-2xl font-bold text-green-600">₹3999<span class="text-sm text-gray-500">/month</span></p>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition select-plot-btn">Select Plot</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="farm-plot-card bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1599837487527-e040915a4b55?w=800" alt="Farm Plot" class="w-full h-56 object-cover">
+                        <div class="absolute top-0 right-0 bg-red-600 text-white px-4 py-2 rounded-bl-lg">Booked</div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold">Urban Garden #3</h3>
+                            <div class="flex items-center">
+                                <i class="bi bi-star-fill text-yellow-500 mr-1"></i>
+                                <span>4.9</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-gray-600 mb-4">
+                            <i class="bi bi-geo-alt mr-1"></i>
+                            <span>Koramangala, Bangalore</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-green-100 text-green-700 text-sm rounded-full">100 sq ft</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">Drip Irrigation</span>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-sm rounded-full">Basic Tools</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <p class="text-2xl font-bold text-green-600">₹999<span class="text-sm text-gray-500">/month</span></p>
+                            <button class="bg-gray-300 text-gray-600 px-4 py-2 rounded-lg cursor-not-allowed">Unavailable</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-10">
+                <button class="px-6 py-3 bg-transparent border border-green-600 text-green-600 rounded-lg hover:bg-green-600 hover:text-white transition">View All Farm Plots</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">How It Works</h2>
+            <p class="text-gray-600 text-center mb-12 max-w-3xl mx-auto">Follow these simple steps to start growing your own organic food with FarmConnect.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="h-20 w-20 rounded-full bg-green-600 text-white flex items-center justify-center text-2xl font-bold mx-auto">1</div>
+                    <h3 class="text-xl font-semibold my-4">Choose a Farm Plot</h3>
+                    <p class="text-gray-600">Select from various available farm plots based on location and size.</p>
+                </div>
+                <div class="text-center relative">
+                    <div class="hidden md:block absolute left-0 top-10 h-0.5 w-full bg-green-300 -z-10"></div>
+                    <div class="h-20 w-20 rounded-full bg-green-600 text-white flex items-center justify-center text-2xl font-bold mx-auto">2</div>
+                    <h3 class="text-xl font-semibold my-4">Select Your Crops</h3>
+                    <p class="text-gray-600">Choose from seasonal vegetables, fruits, and herbs for your plot.</p>
+                </div>
+                <div class="text-center relative">
+                    <div class="hidden md:block absolute left-0 top-10 h-0.5 w-full bg-green-300 -z-10"></div>
+                    <div class="h-20 w-20 rounded-full bg-green-600 text-white flex items-center justify-center text-2xl font-bold mx-auto">3</div>
+                    <h3 class="text-xl font-semibold my-4">Track Growth Progress</h3>
+                    <p class="text-gray-600">Monitor your farm's progress with regular updates and live tracking.</p>
+                </div>
+                <div class="text-center relative">
+                    <div class="hidden md:block absolute left-0 top-10 h-0.5 w-full bg-green-300 -z-10"></div>
+                    <div class="h-20 w-20 rounded-full bg-green-600 text-white flex items-center justify-center text-2xl font-bold mx-auto">4</div>
+                    <h3 class="text-xl font-semibold my-4">Harvest & Enjoy</h3>
+                    <p class="text-gray-600">Harvest your organic produce and have it delivered or pick it up yourself.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Section -->
+    <div id="shop" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Organic Produce Shop</h2>
+            <p class="text-gray-600 text-center mb-12 max-w-3xl mx-auto">Can't wait for your harvest? Buy fresh organic produce directly from our network of trusted farmers.</p>
+            
+            <div class="mb-8 flex flex-wrap justify-center gap-4">
+                <button class="px-4 py-2 rounded-full bg-green-600 text-white hover:bg-green-700 transition">All Produce</button>
+                <button class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition">Vegetables</button>
+                <button class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition">Fruits</button>
+                <button class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition">Herbs</button>
+                <button class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition">Subscription Boxes</button>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="produce-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1518977881905-925b1b73509f?w=800" alt="Organic Tomatoes" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold">Organic Tomatoes</h3>
+                        <div class="flex justify-between items-center mt-2">
+                            <p class="font-bold text-green-600">₹60<span class="text-sm text-gray-500">/500g</span></p>
+                            <button class="bg-green-100 text-green-600 p-2 rounded-full hover:bg-green-200 transition add-to-cart-btn">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="produce-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1587049352851-8d4e89133924?w=800" alt="Organic Spinach" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold">Organic Spinach</h3>
+                        <div class="flex justify-between items-center mt-2">
+                            <p class="font-bold text-green-600">₹40<span class="text-sm text-gray-500">/bunch</span></p>
+                            <button class="bg-green-100 text-green-600 p-2 rounded-full hover:bg-green-200 transition add-to-cart-btn">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="produce-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1580716786533-6bbae6cddf6f?w=800" alt="Organic Carrots" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold">Organic Carrots</h3>
+                        <div class="flex justify-between items-center mt-2">
+                            <p class="font-bold text-green-600">₹55<span class="text-sm text-gray-500">/500g</span></p>
+                            <button class="bg-green-100 text-green-600 p-2 rounded-full hover:bg-green-200 transition add-to-cart-btn">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="produce-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1579113800032-c38bd7635818?w=800" alt="Organic Strawberries" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold">Organic Strawberries</h3>
+                        <div class="flex justify-between items-center mt-2">
+                            <p class="font-bold text-green-600">₹120<span class="text-sm text-gray-500">/250g</span></p>
+                            <button class="bg-green-100 text-green-600 p-2 rounded-full hover:bg-green-200 transition add-to-cart-btn">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-gray-50 rounded-lg p-6 shadow-md">
+                    <div class="flex items-center mb-4">
+                        <i class="bi bi-box-seam text-3xl text-green-600 mr-4"></i>
+                        <div>
+                            <h3 class="text-xl font-semibold">Weekly Subscription Box</h3>
+                            <p class="text-gray-600">Fresh seasonal vegetables delivered to your door.</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <p class="font-bold text-green-600 text-xl">₹599<span class="text-sm text-gray-500">/week</span></p>
+                        <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">Subscribe</button>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-6 shadow-md">
+                    <div class="flex items-center mb-4">
+                        <i class="bi bi-basket3 text-3xl text-green-600 mr-4"></i>
+                        <div>
+                            <h3 class="text-xl font-semibold">Fruit Subscription Box</h3>
+                            <p class="text-gray-600">Assorted seasonal fruits delivered weekly.</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <p class="font-bold text-green-600 text-xl">₹699<span class="text-sm text-gray-500">/week</span></p>
+                        <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-10">
+                <button class="px-6 py-3 bg-transparent border border-green-600 text-green-600 rounded-lg hover:bg-green-600 hover:text-white transition">View All Products</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboard" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Farm Dashboard</h2>
+            <p class="text-gray-600 text-center mb-12 max-w-3xl mx-auto">Monitor your farm plots with real-time updates, track growth progress, and manage harvests.</p>
+            
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+                <div class="p-6 border-b">
+                    <h3 class="text-xl font-semibold mb-1">Your Active Plot: Hillside #14</h3>
+                    <p class="text-gray-600">Whitefield, Bangalore • 200 sq ft</p>
+                </div>
+                
+                <div class="p-6">
+                    <div class="dashboard-grid">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">Overall Health</h4>
+                            <div class="flex items-center">
+                                <div class="w-full bg-gray-200 rounded-full h-4 mr-4">
+                                    <div class="bg-green-600 h-4 rounded-full" style="width: 88%"></div>
+                                </div>
+                                <span class="font-bold">88%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">Soil Moisture</h4>
+                            <div class="flex items-center">
+                                <div class="w-full bg-gray-200 rounded-full h-4 mr-4">
+                                    <div class="bg-blue-600 h-4 rounded-full" style="width: 75%"></div>
+                                </div>
+                                <span class="font-bold">75%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">Sunlight</h4>
+                            <div class="flex items-center">
+                                <div class="w-full bg-gray-200 rounded-full h-4 mr-4">
+                                    <div class="bg-yellow-500 h-4 rounded-full" style="width: 92%"></div>
+                                </div>
+                                <span class="font-bold">92%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">Next Irrigation</h4>
+                            <div class="flex items-center">
+                                <i class="bi bi-droplet text-blue-600 mr-2"></i>
+                                <span>Tomorrow, 6:00 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border-t p-6">
+                    <h4 class="font-semibold mb-4">Your Crops</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Crop</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Growth</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harvest Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 rounded-full overflow-hidden mr-3">
+                                                <img src="https://images.unsplash.com/photo-1518977881905-925b1b73509f?w=800" class="h-full w-full object-cover" alt="Tomatoes">
+                                            </div>
+                                            <div>
+                                                <div class="font-medium">Tomatoes</div>
+                                                <div class="text-sm text-gray-500">Roma</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Healthy</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="w-32 bg-gray-200 rounded-full h-2.5">
+                                            <div class="bg-green-600 h-2.5 rounded-full" style="width: 85%"></div>
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-1">85% complete</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        Aug 15, 2024
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-green-600 hover:text-green-900 mr-3">View Details</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 rounded-full overflow-hidden mr-3">
+                                                <img src="https://images.unsplash.com/photo-1587049352851-8d4e89133924?w=800" class="h-full w-full object-cover" alt="Spinach">
+                                            </div>
+                                            <div>
+                                                <div class="font-medium">Spinach</div>
+                                                <div class="text-sm text-gray-500">Baby</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Needs Water</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="w-32 bg-gray-200 rounded-full h-2.5">
+                                            <div class="bg-green-600 h-2.5 rounded-full" style="width: 60%"></div>
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-1">60% complete</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        Jul 28, 2024
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-green-600 hover:text-green-900 mr-3">View Details</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 rounded-full overflow-hidden mr-3">
+                                                <img src="https://images.unsplash.com/photo-1580716786533-6bbae6cddf6f?w=800" class="h-full w-full object-cover" alt="Carrots">
+                                            </div>
+                                            <div>
+                                                <div class="font-medium">Carrots</div>
+                                                <div class="text-sm text-gray-500">Nantes</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Healthy</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="w-32 bg-gray-200 rounded-full h-2.5">
+                                            <div class="bg-green-600 h-2.5 rounded-full" style="width: 40%"></div>
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-1">40% complete</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        Sep 05, 2024
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-green-600 hover:text-green-900 mr-3">View Details</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="border-t p-6">
+                    <h4 class="font-semibold mb-4">Recent Updates</h4>
+                    <div class="space-y-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i class="bi bi-droplet text-green-600"></i>
+                                </div>
+                            </div>
+                            <div class="ml-3">
+                                <div class="text-sm font-medium text-gray-900">Irrigation Completed</div>
+                                <div class="text-sm text-gray-500">Yesterday, 6:00 AM</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <i class="bi bi-camera text-blue-600"></i>
+                                </div>
+                            </div>
+                            <div class="ml-3">
+                                <div class="text-sm font-medium text-gray-900">New farmer update with 5 photos</div>
+                                <div class="text-sm text-gray-500">3 days ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                                    <i class="bi bi-tools text-yellow-600"></i>
+                                </div>
+                            </div>
+                            <div class="ml-3">
+                                <div class="text-sm font-medium text-gray-900">Maintenance performed (weeding & pest control)</div>
+                                <div class="text-sm text-gray-500">Last week</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <a href="#" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition inline-flex items-center">
+                    <i class="bi bi-camera-video mr-2"></i> View Live Farm Cam
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Community Section -->
+    <div id="community" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Join Our Community</h2>
+            <p class="text-gray-600 text-center mb-12 max-w-3xl mx-auto">Connect with fellow urban farmers, share tips, and learn sustainable farming practices from our experts.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md">
+                    <img src="https://images.unsplash.com/photo-1597916829826-02e5bb4a54e0?w=800" alt="Workshop" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">Workshop</span>
+                            <span class="text-gray-600 text-sm">Jul 25, 2024</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Organic Pest Control Methods</h3>
+                        <p class="text-gray-600 mb-4">Learn effective and natural ways to keep pests away from your crops without harmful chemicals.</p>
+                        <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">Register</button>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md">
+                    <img src="https://images.unsplash.com/photo-1494386346843-e12284507169?w=800" alt="Forum" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">Discussion</span>
+                            <span class="text-gray-600 text-sm">Active</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Growing in Small Spaces</h3>
+                        <p class="text-gray-600 mb-4">Join the conversation on maximizing yield in limited urban farming spaces.</p>
+                        <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">Join Discussion</button>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md">
+                    <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800" alt="Recipe" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-sm rounded-full">Recipe</span>
+                            <span class="text-gray-600 text-sm">New</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Farm to Table Recipes</h3>
+                        <p class="text-gray-600 mb-4">Discover delicious ways to use your freshly harvested produce with our chef-approved recipes.</p>
+                        <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">View Recipes</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg shadow-lg p-8 mb-12">
+                <h3 class="text-2xl font-semibold text-center mb-8">Expert Farmers & Mentors</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="h-24 w-24 mx-auto rounded-full overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?w=800" alt="Farmer" class="h-full w-full object-cover">
+                        </div>
+                        <h4 class="text-xl font-semibold">Rajesh Singh</h4>
+                        <p class="text-gray-600">Organic Farming Expert</p>
+                        <div class="flex justify-center mt-2">
+                            <div class="flex">
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="h-24 w-24 mx-auto rounded-full overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=800" alt="Farmer" class="h-full w-full object-cover">
+                        </div>
+                        <h4 class="text-xl font-semibold">Priya Sharma</h4>
+                        <p class="text-gray-600">Urban Farming Specialist</p>
+                        <div class="flex justify-center mt-2">
+                            <div class="flex">
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star-half text-yellow-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="h-24 w-24 mx-auto rounded-full overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800" alt="Farmer" class="h-full w-full object-cover">
+                        </div>
+                        <h4 class="text-xl font-semibold">Vishal Patel</h4>
+                        <p class="text-gray-600">Permaculture Designer</p>
+                        <div class="flex justify-center mt-2">
+                            <div class="flex">
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star-fill text-yellow-500"></i>
+                                <i class="bi bi-star text-yellow-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="relative">
+                <h3 class="text-2xl font-semibold text-center mb-8">Customer Testimonials</h3>
+                <div class="testimonial-slider flex overflow-x-auto pb-8 -mx-4 px-4 space-x-4">
+                    <div class="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-6 bg-white rounded-lg shadow-lg border border-gray-100">
+                        <div class="flex items-center mb-4">
+                            <div class="h-12 w-12 rounded-full overflow-hidden mr-4">
+                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800" alt="Customer" class="h-full w-full object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Meera Joshi</h4>
+                                <div class="flex text-yellow-500">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 italic">"FarmConnect has completely changed how my family eats. Growing our own organic food has been incredibly rewarding, and the support from the farmers is excellent."</p>
+                    </div>
+                    
+                    <div class="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-6 bg-white rounded-lg shadow-lg border border-gray-100">
+                        <div class="flex items-center mb-4">
+                            <div class="h-12 w-12 rounded-full overflow-hidden mr-4">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800" alt="Customer" class="h-full w-full object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Arjun Mehta</h4>
+                                <div class="flex text-yellow-500">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 italic">"As a busy professional, I never thought I'd have time for farming. FarmConnect made it easy with their managed plots. The dashboard is brilliant for tracking progress remotely."</p>
+                    </div>
+                    
+                    <div class="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-6 bg-white rounded-lg shadow-lg border border-gray-100">
+                        <div class="flex items-center mb-4">
+                            <div class="h-12 w-12 rounded-full overflow-hidden mr-4">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800" alt="Customer" class="h-full w-full object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Sanya Khanna</h4>
+                                <div class="flex text-yellow-500">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 italic">"The quality of produce is outstanding. My kids love visiting our plot and learning about where food comes from. It's educational and the taste is incomparable to store-bought vegetables."</p>
+                    </div>
+                </div>
+                <button class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md text-green-600 hover:text-green-800 focus:outline-none prev-testimonial hidden md:block">
+                    <i class="bi bi-chevron-left text-xl"></i>
+                </button>
+                <button class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md text-green-600 hover:text-green-800 focus:outline-none next-testimonial hidden md:block">
+                    <i class="bi bi-chevron-right text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Section -->
+    <div class="bg-gray-50 py-20">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Choose Your Plan</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4">Basic</h3>
+                    <p class="text-3xl font-bold mb-4">₹999<span class="text-sm text-gray-500">/month</span></p>
+                    <ul class="mb-8 space-y-3">
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Small farm plot (100 sq ft)</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Basic farming tools</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Weekly updates</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Basic dashboard access</li>
+                        <li class="flex items-center text-gray-400"><i class="bi bi-x text-red-500 mr-2"></i>Live farm cam</li>
+                        <li class="flex items-center text-gray-400"><i class="bi bi-x text-red-500 mr-2"></i>Priority harvest access</li>
+                    </ul>
+                    <button class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">Select Plan</button>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg border-2 border-green-600 transform scale-105">
+                    <div class="absolute top-0 right-0 bg-green-600 text-white px-4 py-1 rounded-bl-lg">Popular</div>
+                    <h3 class="text-xl font-semibold mb-4">Premium</h3>
+                    <p class="text-3xl font-bold mb-4">₹1999<span class="text-sm text-gray-500">/month</span></p>
+                    <ul class="mb-8 space-y-3">
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Medium farm plot (200 sq ft)</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Complete farming toolkit</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Daily updates & support</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Full dashboard access</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Live farm cam</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Monthly workshop access</li>
+                    </ul>
+                    <button class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">Select Plan</button>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4">Pro</h3>
+                    <p class="text-3xl font-bold mb-4">₹3999<span class="text-sm text-gray-500">/month</span></p>
+                    <ul class="mb-8 space-y-3">
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Large farm plot (400 sq ft)</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Premium farming equipment</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>24/7 expert support</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Advanced dashboard</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Live farm cam + time-lapse</li>
+                        <li class="flex items-center"><i class="bi bi-check2 text-green-600 mr-2"></i>Priority harvest access</li>
+                    </ul>
+                    <button class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">Select Plan</button>
+                </div>
+            </div>
+            <div class="text-center mt-12">
+                <p class="text-gray-600 mb-4">Need a custom solution for your family or business?</p>
+                <a href="#" class="text-green-600 font-semibold hover:text-green-700">Contact us for custom plans <i class="bi bi-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="py-20 bg-green-600 text-white">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Grow Your Own Organic Food?</h2>
+            <p class="text-lg mb-8">Join thousands of satisfied customers who have transformed their relationship with food through sustainable farming.</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <button class="bg-white text-green-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition">Get Started Today</button>
+                <button class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-white hover:text-green-600 transition">Book a Demo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Download Section -->
+    <div class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h2 class="text-3xl font-bold mb-6">Download the FarmConnect App</h2>
+                    <p class="text-lg text-gray-600 mb-8">Get real-time updates, track your farm plots, and order organic produce on the go with our mobile app.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#" class="flex items-center bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition">
+                            <i class="bi bi-apple text-3xl mr-3"></i>
+                            <div>
+                                <div class="text-xs">Download on the</div>
+                                <div class="text-lg font-semibold">App Store</div>
+                            </div>
+                        </a>
+                        <a href="#" class="flex items-center bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition">
+                            <i class="bi bi-google-play text-3xl mr-3"></i>
+                            <div>
+                                <div class="text-xs">Get it on</div>
+                                <div class="text-lg font-semibold">Google Play</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <div class="w-64 rounded-3xl shadow-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?w=800" alt="App Screenshot" class="w-full">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="text-xl font-semibold mb-4">FarmConnect</h4>
+                    <p class="text-gray-400">Growing sustainable futures together. Connecting urban dwellers with organic farming practices for healthier communities.</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-2xl hover:text-green-400"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-2xl hover:text-green-400"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-2xl hover:text-green-400"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-2xl hover:text-green-400"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-xl font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#farmplots" class="text-gray-400 hover:text-white">Farm Plots</a></li>
+                        <li><a href="#shop" class="text-gray-400 hover:text-white">Shop</a></li>
+                        <li><a href="#dashboard" class="text-gray-400 hover:text-white">Dashboard</a></li>
+                        <li><a href="#community" class="text-gray-400 hover:text-white">Community</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xl font-semibold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-start">
+                            <i class="bi bi-envelope text-green-400 mr-2 mt-1"></i>
+                            <span>info@farmconnect.com</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="bi bi-telephone text-green-400 mr-2 mt-1"></i>
+                            <span>+91 98765 43210</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="bi bi-geo-alt text-green-400 mr-2 mt-1"></i>
+                            <span>123 Farm Street, Whitefield<br>Bangalore, Karnataka 560066</span>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xl font-semibold mb-4">Newsletter</h4>
+                    <p class="text-gray-400 mb-4">Subscribe to our newsletter for farming tips, seasonal updates, and special offers.</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 rounded-l-lg focus:outline-none text-gray-800 w-full">
+                        <button class="bg-green-600 px-4 py-2 rounded-r-lg hover:bg-green-700 transition">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <div class="flex justify-between flex-wrap">
+                    <p>&copy; 2024 FarmConnect. All rights reserved.</p>
+                    <div class="flex space-x-4 mt-4 md:mt-0">
+                        <a href="#" class="hover:text-white">Privacy Policy</a>
+                        <a href="#" class="hover:text-white">Terms of Service</a>
+                        <a href="#" class="hover:text-white">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Loading spinner functionality
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        
+        function showLoading() {
+            loadingSpinner.style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            loadingSpinner.style.display = 'none';
+        }
+
+        // Toggle Notification Panel
+        const notificationBtn = document.getElementById('notificationBtn');
+        const notificationBtnMobile = document.getElementById('notificationBtnMobile');
+        const notificationPanel = document.getElementById('notificationPanel');
+        const closeNotifications = document.getElementById('closeNotifications');
+        
+        function toggleNotifications() {
+            notificationPanel.classList.toggle('hidden');
+        }
+        
+        notificationBtn.addEventListener('click', toggleNotifications);
+        notificationBtnMobile.addEventListener('click', toggleNotifications);
+        closeNotifications.addEventListener('click', () => {
+            notificationPanel.classList.add('hidden');
+        });
+        
+        // Modal Functionality
+        const loginBtn = document.getElementById('loginBtn');
+        const loginBtnMobile = document.getElementById('loginBtnMobile');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const showLoginBtn = document.getElementById('showLogin');
+        const showRegisterBtn = document.getElementById('showRegister');
+        
+        loginBtn.addEventListener('click', () => {
+            loginModal.style.display = 'flex';
+        });
+        
+        loginBtnMobile.addEventListener('click', () => {
+            loginModal.style.display = 'flex';
+        });
+        
+        showRegisterBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.style.display = 'none';
+            registerModal.style.display = 'flex';
+        });
+        
+        showLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerModal.style.display = 'none';
+            loginModal.style.display = 'flex';
+        });
+        
+        // Close modal functionality
+        document.querySelectorAll('.close-modal').forEach(button => {
+            button.addEventListener('click', () => {
+                loginModal.style.display = 'none';
+                registerModal.style.display = 'none';
+            });
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+            if (e.target === registerModal) {
+                registerModal.style.display = 'none';
+            }
+        });
+        
+        // Login form submission
+        const loginSubmit = document.getElementById('loginSubmit');
+        
+        loginSubmit.addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            showLoading();
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            hideLoading();
+            
+            loginModal.style.display = 'none';
+            alert('Login successful!');
+        });
+        
+        // Register form submission
+        const registerSubmit = document.getElementById('registerSubmit');
+        
+        registerSubmit.addEventListener('click', async () => {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const phone = document.getElementById('registerPhone').value;
+            const termsAccepted = document.getElementById('termsCheckbox').checked;
+            
+            if (!name || !email || !password || !phone) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (!termsAccepted) {
+                alert('Please accept the terms and conditions');
+                return;
+            }
+            
+            showLoading();
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            hideLoading();
+            
+            registerModal.style.display = 'none';
+            alert('Registration successful! Welcome to FarmConnect.');
+        });
+
+        // Add to cart functionality
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const productName = e.target.closest('.produce-card').querySelector('h3').textContent;
+                
+                showLoading();
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 800));
+                hideLoading();
+                
+                alert(`${productName} added to cart!`);
+            });
+        });
+        
+        // Farm plot selection
+        document.querySelectorAll('.select-plot-btn').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const plotName = e.target.closest('.farm-plot-card').querySelector('h3').textContent;
+                
+                showLoading();
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                hideLoading();
+                
+                alert(`You've selected ${plotName}! Our team will contact you to complete the process.`);
+            });
+        });
+
+        // Add loading animation for subscription buttons
+        document.querySelectorAll('button').forEach(button => {
+            if (button.textContent.trim() === 'Select Plan') {
+                button.addEventListener('click', async (e) => {
+                    showLoading();
+                    // Simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    hideLoading();
+                    alert('Thank you for selecting this plan! Our team will contact you shortly.');
+                });
+            }
+            
+            if (button.textContent.trim() === 'Subscribe') {
+                button.addEventListener('click', async (e) => {
+                    showLoading();
+                    // Simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    hideLoading();
+                    alert('Thank you for subscribing! Your first delivery will be scheduled soon.');
+                });
+            }
+        });
+        
+        // Testimonial slider functionality
+        const prevTestimonial = document.querySelector('.prev-testimonial');
+        const nextTestimonial = document.querySelector('.next-testimonial');
+        const testimonialSlider = document.querySelector('.testimonial-slider');
+        
+        if (prevTestimonial && nextTestimonial) {
+            prevTestimonial.addEventListener('click', () => {
+                testimonialSlider.scrollBy({ left: -300, behavior: 'smooth' });
+            });
+            
+            nextTestimonial.addEventListener('click', () => {
+                testimonialSlider.scrollBy({ left: 300, behavior: 'smooth' });
+            });
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                if (this.getAttribute('href') === '#') return;
+                
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                
+                if (target) {
+                    // Close mobile menu if open
+                    mobileMenu.classList.add('hidden');
+                    
+                    // Scroll to the target
+                    window.scrollTo({
+                        top: target.offsetTop - 80, // Adjust for fixed header
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Generate userId if not exists
+        if (!localStorage.getItem('farmConnectUserId')) {
+            const userId = 'user_' + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('farmConnectUserId', userId);
+        }
+        
+        // Initialize MongoDB connection
+        async function initDatabase() {
+            try {
+                // Create app slug with random suffix for uniqueness
+                const appSlug = 'farm-connect-' + Math.random().toString(36).substring(2, 8);
+                localStorage.setItem('farmConnectAppSlug', appSlug);
+                
+                const userId = localStorage.getItem('farmConnectUserId');
+                
+                // Initialize database collections (this is just a check - collections are created automatically when needed)
+                await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer fYBScb7ZPLOQuxszyXjhKpNq9js1',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        appSlug: appSlug,
+                        action: 'read',
+                        collection: 'farms'
+                    })
+                });
+            } catch (error) {
+                console.error('Database initialization error:', error);
+            }
+        }
+        
+        // Initialize the application
+        window.addEventListener('DOMContentLoaded', () => {
+            // Initialize database in background
+            initDatabase();
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
